@@ -20,4 +20,5 @@ Since this is a pure client-side project, you can run it instantly without insta
 ```bash
    git clone git@github.com:willcz23/html-online-editor.git
    cd html-online-editor
-2. Double click index.html
+```
+2. Double click index.html to open it in a browser.
