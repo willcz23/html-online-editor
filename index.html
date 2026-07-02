@@ -11,31 +11,34 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Live HTML Studio</p>
-          <h1>HTML 双向编辑器</h1>
+          <h1>HTML 编辑器</h1>
         </div>
-        <p class="hint">左边写源码，右边直接改预览，内容会双向同步。</p>
+        <p class="hint">在一个大编辑区里写完整 HTML，点击按钮在新窗口展开预览，打开后会持续同步。</p>
       </header>
 
       <main class="workspace">
-        <section class="panel panel-code">
+        <section class="panel panel-editor">
           <div class="panel-head">
-            <h2>HTML 源码</h2>
-            <button id="resetBtn" type="button">恢复示例</button>
+            <div>
+              <h2>HTML 源码</h2>
+              <p class="panel-tip">支持 Tab / Shift+Tab 缩进，Enter 保留当前行缩进。CSS 继续写在 HTML 里的 style 标签里。</p>
+            </div>
+            <div class="actions">
+              <span id="previewStatus" class="status-pill">预览未打开</span>
+              <button id="openPreviewBtn" class="button-secondary" type="button">打开预览窗口</button>
+              <button id="refreshPreviewBtn" class="button-secondary" type="button">刷新预览</button>
+              <button id="resetBtn" type="button">恢复示例</button>
+            </div>
           </div>
-          <label class="sr-only" for="codeInput">HTML 源码输入框</label>
-          <textarea id="codeInput" spellcheck="false"></textarea>
-        </section>
 
-        <section class="panel panel-preview">
-          <div class="panel-head">
-            <h2>实时预览</h2>
-            <span>可直接编辑</span>
+          <label class="sr-only" for="codeInput">HTML 源码输入框</label>
+          <div class="editor-shell">
+            <pre id="lineNumbers" class="line-numbers" aria-hidden="true">1</pre>
+            <div class="editor-main">
+              <div id="currentLineHighlight" class="current-line-highlight" aria-hidden="true"></div>
+              <textarea id="codeInput" spellcheck="false"></textarea>
+            </div>
           </div>
-          <iframe
-            id="previewFrame"
-            title="HTML 实时预览"
-            sandbox="allow-scripts allow-same-origin"
-          ></iframe>
         </section>
       </main>
     </div>

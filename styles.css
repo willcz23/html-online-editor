@@ -1,12 +1,13 @@
 :root {
   --bg: #f6efe4;
-  --bg-strong: #eadfcd;
   --panel: rgba(255, 252, 247, 0.92);
   --panel-border: rgba(78, 56, 28, 0.18);
   --text: #2d2218;
   --muted: #7a6853;
   --accent: #0d5c63;
   --accent-strong: #0a474c;
+  --accent-soft: rgba(13, 92, 99, 0.12);
+  --editor-highlight: rgba(13, 92, 99, 0.18);
   --shadow: 0 24px 60px rgba(55, 38, 17, 0.12);
   --radius: 24px;
 }
@@ -32,8 +33,8 @@ textarea {
 }
 
 .app-shell {
-  width: min(1400px, calc(100vw - 32px));
-  margin: 24px auto;
+  width: min(1720px, calc(100vw - 28px));
+  margin: 16px auto;
 }
 
 .topbar {
@@ -59,20 +60,18 @@ textarea {
 }
 
 .hint {
-  max-width: 420px;
+  max-width: 500px;
   margin: 0;
   color: var(--muted);
   line-height: 1.5;
 }
 
 .workspace {
-  display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
-  gap: 18px;
+  display: block;
 }
 
 .panel {
-  min-height: 75vh;
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -87,20 +86,42 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   padding: 18px 22px;
   border-bottom: 1px solid rgba(78, 56, 28, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent);
 }
 
-.panel-head h2,
-.panel-head span {
-  margin: 0;
+.panel-head h2 {
+  margin: 0 0 3px;
   font-size: 1rem;
 }
 
-.panel-head span {
+.panel-tip {
+  margin: 0;
   color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  white-space: nowrap;
 }
 
 button {
@@ -118,26 +139,74 @@ button:hover {
   transform: translateY(-1px);
 }
 
-textarea {
+.button-secondary {
+  background: #c48a38;
+}
+
+.button-secondary:hover {
+  background: #ab7426;
+}
+
+.editor-shell {
   flex: 1;
-  width: 100%;
-  border: 0;
-  resize: none;
-  padding: 22px;
-  color: #f6f6f3;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  min-height: 0;
   background: linear-gradient(180deg, #1d1d1f, #121214);
+}
+
+.editor-main {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.line-numbers,
+textarea {
+  color: #f6f6f3;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.65;
-  outline: none;
+  font-size: 15px;
+  line-height: 1.72;
   tab-size: 2;
 }
 
-iframe {
-  flex: 1;
+.line-numbers {
+  margin: 0;
+  padding: 24px 12px 28px 0;
+  overflow: hidden;
+  text-align: right;
+  color: rgba(246, 246, 243, 0.42);
+  background: linear-gradient(180deg, #232327, #17171a);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: none;
+}
+
+.current-line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(15px * 1.72);
+  background: linear-gradient(90deg, rgba(13, 92, 99, 0.14), var(--editor-highlight));
+  pointer-events: none;
+  transform: translateY(24px);
+  transition: transform 90ms ease-out;
+}
+
+textarea {
+  flex: 1 1 auto;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+  position: relative;
+  z-index: 1;
   border: 0;
-  background: white;
+  resize: none;
+  padding: 24px 26px 28px 22px;
+  background: transparent;
+  outline: none;
 }
 
 .sr-only {
@@ -152,10 +221,10 @@ iframe {
   border: 0;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 960px) {
   .app-shell {
-    width: min(100vw - 20px, 1400px);
-    margin: 10px auto 20px;
+    width: min(100vw - 18px, 1720px);
+    margin: 10px auto 18px;
   }
 
   .topbar {
@@ -163,11 +232,21 @@ iframe {
     align-items: start;
   }
 
-  .workspace {
-    grid-template-columns: 1fr;
+  .panel {
+    min-height: 78vh;
   }
 
-  .panel {
-    min-height: 46vh;
+  .panel-head {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: start;
+  }
+
+  .editor-shell {
+    grid-template-columns: 60px minmax(0, 1fr);
   }
 }
