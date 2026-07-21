@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML 预览窗口</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      window.opener?.postMessage({ type: 'preview:ready' }, '*');
+
+      window.addEventListener('message', (event) => {
+        if (event.data?.type !== 'preview:render') {
+          return;
+        }
+
+        document.open();
+        document.write(event.data.source || '');
+        document.close();
+      });
+    </script>
+  </body>
+</html>

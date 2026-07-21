@@ -8,6 +8,7 @@ const currentLineHighlight = document.querySelector('#currentLineHighlight');
 
 const INDENT = '  ';
 const PREVIEW_WINDOW_NAME = 'html-live-preview-window';
+const PREVIEW_TEMPLATE = 'preview.html';
 
 const defaultSource = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -68,6 +69,20 @@ function setStatus(message) {
   previewStatus.textContent = message;
 }
 
+function saveHtmlFile() {
+  const blob = new Blob([codeInput.value], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = 'my-page.html';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  setStatus('已导出 HTML 文件');
+}
+
 function updateLineNumbers() {
   const lineCount = codeInput.value.split('\n').length;
   lineNumbers.textContent = Array.from({ length: lineCount }, (_, index) => String(index + 1)).join('\n');
@@ -89,50 +104,17 @@ function updateCurrentLineHighlight() {
   currentLineHighlight.style.transform = `translateY(${offsetTop}px)`;
 }
 
-function hasHtmlShell(source) {
-  return /<html[\s>]/i.test(source) || /<!doctype/i.test(source);
-}
-
-function buildPreviewDocument(source) {
-  const trimmed = source.trim();
-
-  if (!trimmed) {
-    return `<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <title>空白预览</title>
-  </head>
-  <body></body>
-</html>`;
-  }
-
-  if (hasHtmlShell(trimmed)) {
-    return trimmed;
-  }
-
-  return `<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <title>HTML Fragment Preview</title>
-  </head>
-  <body>
-${trimmed}
-  </body>
-</html>`;
-}
-
 function syncPreviewWindow() {
   if (!previewWindow || previewWindow.closed) {
     setStatus('预览未打开');
     return;
   }
 
-  const nextDocument = buildPreviewDocument(codeInput.value);
-  previewWindow.document.open();
-  previewWindow.document.write(nextDocument);
-  previewWindow.document.close();
+  previewWindow.postMessage({
+    type: 'preview:render',
+    source: codeInput.value
+  }, '*');
+
   setStatus('预览同步中');
 }
 
@@ -271,17 +253,31 @@ function handleEditorShortcuts(event) {
   }
 }
 
+function getPreviewUrl() {
+  return new URL(PREVIEW_TEMPLATE, window.location.href).href;
+}
+
 function openPreviewWindow() {
-  previewWindow = window.open('', PREVIEW_WINDOW_NAME);
+  previewWindow = window.open(getPreviewUrl(), PREVIEW_WINDOW_NAME);
 
   if (!previewWindow) {
     setStatus('浏览器拦截了预览窗口');
     return;
   }
 
-  syncPreviewWindow();
+  setStatus('预览窗口已打开');
   previewWindow.focus();
 }
+
+window.addEventListener('message', (event) => {
+  if (event.data?.type !== 'preview:ready') {
+    return;
+  }
+
+  if (previewWindow && event.source === previewWindow) {
+    syncPreviewWindow();
+  }
+});
 
 codeInput.addEventListener('input', schedulePreviewRefresh);
 codeInput.addEventListener('input', updateLineNumbers);
@@ -296,6 +292,7 @@ codeInput.addEventListener('scroll', () => {
 });
 openPreviewBtn.addEventListener('click', openPreviewWindow);
 refreshPreviewBtn.addEventListener('click', refreshPreview);
+document.querySelector('#saveFileBtn').addEventListener('click', saveHtmlFile);
 
 resetBtn.addEventListener('click', () => {
   codeInput.value = defaultSource;
